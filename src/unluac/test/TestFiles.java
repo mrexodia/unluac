@@ -32,6 +32,7 @@ public class TestFiles {
     new TestFile("literallist"),
     new TestFile("multiliteraltarget"),
     new TestFile("closure"),
+    new TestFile("source_annotations", 0x50, TestFile.ANNOTATE_SOURCE),
     new TestFile("ellipsis03"),
     new TestFile("ifthen"),
     new TestFile("condition"),

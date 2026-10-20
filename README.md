@@ -78,7 +78,44 @@ bash ./unluac.sh --disassemble myfile.luac
 - `--typemap <file>` - Use custom type mapping file (for modified Lua VMs with swapped constant types)
 - `--opmap <file>` - Use custom opcode mapping file (for modified Lua VMs with shuffled opcodes)
 - `--disassemble` - Output disassembly instead of decompiled code
+- `--annotate-source` - Add original source labels and function-definition line ranges as comments
 - `--version` - Show version information
+
+### Optional source annotations
+
+```bash
+bash ./unluac.sh --annotate-source input.luac -o output.lua
+```
+
+Or on Windows:
+
+```powershell
+.\unluac.bat --annotate-source input.luac -o output.lua
+```
+
+This adds a comment at the beginning of the main chunk and inside each emitted
+function body, including anonymous functions:
+
+```lua
+function Example:run(value)
+  -- Original source: "@scripts/example.lua"; definition lines 12-18
+  return value
+end
+```
+
+The annotations use the chunk's debug metadata, not the input filename or the
+line numbers of the generated Lua. Missing source labels inherit from the
+parent prototype; line ranges do not. Unknown labels or definition lines are
+reported as `unavailable` (common for stripped chunks and synthetic wrappers).
+If only a definition's start line is available, only that line is reported.
+
+Source labels retain Lua's `@`/`=` markers and are quoted/escaped so embedded
+newlines or control characters cannot turn a comment into executable Lua.
+Labels can contain original machine paths or source text. These are comments
+only: no statement-level source map or original formatting is reconstructed.
+The flag does not change disassembly/assembly output and is off by default.
+`--nodebug` still disables debug-based variable reconstruction; it does not
+suppress explicitly requested source annotations.
 
 ## Requirements
 
