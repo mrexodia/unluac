@@ -17,34 +17,40 @@
 
 ## Installation
 
-### Download
-
-Download the latest JAR file from the official [SourceForge](https://sourceforge.net/projects/unluac/) page, or use the pre-built `unluac.jar`.
-
 ### Build from Source
 
-**Requirements**: JDK 8 or higher
+**Requirements**: JDK 8 or higher, with `javac` and `java` on your `PATH` (a JRE alone is not enough).
+
+Use one command to compile the current sources and run the tool. From the repository root:
+
+**Linux / macOS / Git Bash:**
 
 ```bash
-# Clone the repository
-git clone https://github.com/Jeong-Min-Cho/unluac.git
-cd unluac
-
-# Compile
-cd src
-javac -d ../build unluac/Main.java
-
-# Create JAR
-cd ../build
-jar cfm ../unluac.jar ../MANIFEST.MF unluac/
+bash ./unluac.sh "input.luac" -o "output.lua"
 ```
+
+**Windows (Command Prompt or PowerShell):**
+
+```powershell
+.\unluac.bat "input.luac" -o "output.lua"
+```
+
+Each invocation cleans `build/classes`, compiles `Main.java` and its dependencies from `src`, and runs the fresh classes. If compilation fails, the tool does not run. All arguments and the exit code are passed through, and build commands do not add anything to stdout, so output redirection also works:
+
+```bash
+bash ./unluac.sh --disassemble "input.luac" > disassembly.txt
+bash ./unluac.sh --typemap xlua.typemap "input.luac" -o "output.lua"
+bash ./unluac.sh --version
+```
+
+After each Java edit, just rerun the same command. You can invoke the scripts by path from another directory; input/output paths remain relative to your working directory. Run invocations sequentially because they share the build directory.
 
 ## Usage
 
 ### Basic Usage
 
 ```bash
-java -jar unluac.jar <input.luac> > output.lua
+bash ./unluac.sh input.luac > output.lua
 ```
 
 ### Examples
@@ -52,19 +58,19 @@ java -jar unluac.jar <input.luac> > output.lua
 **Decompile a Lua chunk:**
 
 ```bash
-java -jar unluac.jar myfile.luac > myfile_decompiled.lua
+bash ./unluac.sh myfile.luac > myfile_decompiled.lua
 ```
 
 **Decompile with custom opcode mapping** (for custom Lua implementations like xlua):
 
 ```bash
-java -jar unluac.jar --opmap opcode_map.txt myfile.luac > output.lua
+bash ./unluac.sh --opmap opcode_map.txt myfile.luac > output.lua
 ```
 
 **Disassemble instead of decompile:**
 
 ```bash
-java -jar unluac.jar --disassemble myfile.luac
+bash ./unluac.sh --disassemble myfile.luac
 ```
 
 ### Command-line Options
@@ -76,7 +82,7 @@ java -jar unluac.jar --disassemble myfile.luac
 
 ## Requirements
 
-- **Java**: JRE/JDK 8 or higher
+- **Java**: JDK 8 or higher
 - **Input**: Lua bytecode compiled with debug information (default for `luac`)
 - **Supported Lua Versions**: 5.0, 5.1, 5.2, 5.3, 5.4
 
@@ -130,7 +136,7 @@ def fix_xlua_header(data: bytes) -> bytes:
 **Step 3 — Decompile:**
 
 ```bash
-java -jar unluac.jar --typemap xlua.typemap fixed.luac -o output.lua
+bash ./unluac.sh --typemap xlua.typemap fixed.luac -o output.lua
 ```
 
 The 3-byte upvalue format is handled automatically; no extra flags needed.
@@ -183,7 +189,7 @@ If you have `luac` installed:
 # Compile test files and run decompiler
 cd test/src
 luac -o ../compiled/test.luac test.lua
-java -jar ../../unluac.jar ../compiled/test.luac
+bash ../../unluac.sh ../compiled/test.luac
 ```
 
 ## License
@@ -235,7 +241,7 @@ print(greet("World"))
 luac -o original.luac original.lua
 
 # Decompile
-java -jar unluac.jar original.luac > decompiled.lua
+bash ./unluac.sh original.luac > decompiled.lua
 ```
 
 ### Example 2: xLua Bytecode (Unity Games)
@@ -264,7 +270,7 @@ with open("fixed.luac", "wb") as f:
 **3. Decompile:**
 
 ```bash
-java -jar unluac.jar --typemap xlua.typemap fixed.luac -o output.lua
+bash ./unluac.sh --typemap xlua.typemap fixed.luac -o output.lua
 ```
 
 ### Example 3: Custom Opcode Mapping
@@ -287,7 +293,7 @@ For modified Lua implementations with shuffled opcodes (xLua does **not** shuffl
 2. Decompile with mapping:
 
 ```bash
-java -jar unluac.jar --opmap opcodes.txt custom.luac > output.lua
+bash ./unluac.sh --opmap opcodes.txt custom.luac > output.lua
 ```
 
 **Note**: This tool is intended for legitimate purposes such as debugging, learning, and analyzing Lua code. Please respect intellectual property rights and use responsibly.
